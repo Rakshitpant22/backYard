@@ -1,10 +1,11 @@
-const  asyncHandler= (requestHandler) =>{
-    (req,res,next)=>{
-        Promise.resolve(requestHandler(req,res,next))
-        .catch((err)=>next(err))
+const asyncHandler = (requestHandler) =>{
+    return (req, res, next) => {
+        Promise.resolve(requestHandler(req, res, next))
+        .catch((err) => next(err));
     }
 }
-export {asyncHandler}
+
+export { asyncHandler };
 
 // Asynchronous route handlers often involve promises or async/await syntax, which can result in unhandled promise rejections if errors are not properly caught. By using asyncHandler, you can simplify error handling for these asynchronous operations:
 // •	Without asyncHandler:
