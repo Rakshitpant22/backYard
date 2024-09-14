@@ -75,6 +75,7 @@ return jwt.sign({
   expiresIn:process.env.ACCESS_TOKEN_EXPIRY
   }
 )}
+// ! Refresh token genrated by JWT
 userSchema.methods.generateRefreshTokens= function(){
     return jwt.sign({
        id:this.id,
