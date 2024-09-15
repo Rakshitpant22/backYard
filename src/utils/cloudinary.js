@@ -2,7 +2,7 @@
 // so when fles gets uploaded on cloudinary we remove that from our local server ( this is done by unlink method of node js file system )
 
 import { v2 as cloudinary} from "cloudinary";
-import fs from 'fs ' // node js has file system helps in read write etc.. tasks
+import fs from 'fs' // node js has file system helps in read write etc.. tasks
 
    cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
