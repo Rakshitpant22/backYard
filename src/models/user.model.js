@@ -64,7 +64,7 @@ userSchema.methods.isPasswordCorrect = async function(password){
 // for this mongoose gives us methods to make custom methods; if not there it will created ex isPasswordCorrect
 
 // ! Access token genrated by JWT
-userSchema.methods.generateAccessTokens= function(){
+userSchema.methods.generateAccessToken= function(){
 return jwt.sign({
     id:this.id,
     email:this.email,
@@ -76,7 +76,7 @@ return jwt.sign({
   }
 )}
 // ! Refresh token genrated by JWT
-userSchema.methods.generateRefreshTokens= function(){
+userSchema.methods.generateRefreshToken= function(){
     return jwt.sign({
        id:this.id,
      },process.env.REFRESH_TOKEN_SECRET,
