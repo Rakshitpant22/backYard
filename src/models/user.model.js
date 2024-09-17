@@ -58,31 +58,39 @@ userSchema.pre("save", async function(next) { //pre uses nomral function bcs arr
 }) 
 
 userSchema.methods.isPasswordCorrect = async function(password){
- await bcrypt.compare(password,this.password) 
+ return await bcrypt.compare(password,this.password) 
 }
 // jab user ko import karae usse pehle puchle password is wrong or correct
 // for this mongoose gives us methods to make custom methods; if not there it will created ex isPasswordCorrect
 
 // ! Access token genrated by JWT
-userSchema.methods.generateAccessToken= function(){
-return jwt.sign({
-    id:this.id,
-    email:this.email,
-    username:this.username,
-    fullName:this.fullName
- },process.env.ACCESS_TOKEN_SECRET,
-  {
-  expiresIn:process.env.ACCESS_TOKEN_EXPIRY
-  }
-)}
+userSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            username: this.username,
+            fullName: this.fullName
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
+
 // ! Refresh token genrated by JWT
-userSchema.methods.generateRefreshToken= function(){
-    return jwt.sign({
-       id:this.id,
-     },process.env.REFRESH_TOKEN_SECRET,
-       {
-      expiresIn:process.env.REFRESH_TOKEN_EXPIRY
-       }
-)}
+userSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+            
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
+}
 
 export const User = mongoose.model("User",userSchema)
