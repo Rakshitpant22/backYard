@@ -186,7 +186,6 @@ const logoutUser = asyncHandler(async (req,res)=>{
    .json(new ApiResponse(200,{},"User logged Out"))
 })
 
-
 // Access Token - Short lived, not stored in db
 // Refresh Token - Long lived, stored in db
 // When access token expires, the frontend sends the refresh token to the backend to validate user (login), once again.
@@ -232,5 +231,139 @@ const refreshAccessToken= asyncHandler(async(req,res)=>{
   }
 })
 
-export { registerUser ,loginUser ,logoutUser,refreshAccessToken};
+// •	Use await when you want to wait for the result of the async function before proceeding.
+// •	You can omit await if you don’t need to wait for the result immediately or if you plan to handle the promise separately later.
+//! Update new Password
+const changeCurrentPassword = asyncHandler(async (req,res)=>{
+  const{oldPassword,newPassword}=req.body
+  const user = User.findById(req.userId?._id)
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+
+  if(!isPasswordCorrect){
+    throw new ApiError(400,"Invalid password")
+  }
+   //else  set and save the new password
+    user.password=newPassword //set new password
+    await user.save({validateBeforeSave:false}) //save new password
+
+    return res
+    .status(200)
+    .json(
+      new ApiResponse(200,{},"Password Updated Succesfully")
+    )
+})
+
+const getCurrentUser= asyncHandler(async(req,res)=>{
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200,{},"Current User fetched Succesfully")
+  )
+})
+//!update account details
+const updateAccountDetails = asyncHandler(async(req, res) => {
+  const {fullName, email} = req.body
+
+  if (!fullName || !email) {
+      throw new ApiError(400, "All fields are required")
+  }
+
+  const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+          $set: {
+              fullName,
+              email: email
+          }
+      },
+      {new: true}
+      
+  ).select("-password")
+
+  return res
+  .status(200)
+  .json(new ApiResponse(200, user, "Account details updated successfully"))
+});
+
+//!update avatar
+const updateUserAvatar = asyncHandler(async(req, res) => {
+  const avatarLocalPath = req.file?.path
+
+  if (!avatarLocalPath) {
+      throw new ApiError(400, "Avatar file is missing")
+  }
+
+  // TODO: delete old image - assignment
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+  if (!avatar.url) {
+      throw new ApiError(400, "Error while uploading on avatar")
+      
+  }
+
+  const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+          $set:{
+              avatar: avatar.url
+          }
+      },
+      {new: true}
+  ).select("-password")
+
+  return res
+  .status(200)
+  .json(
+      new ApiResponse(200, user, "Avatar image updated successfully")
+  )
+})
+//!update user cover Image
+const updateUserCoverImage = asyncHandler(async(req, res) => {
+  const coverImageLocalPath = req.file?.path
+
+  if (!coverImageLocalPath) {
+      throw new ApiError(400, "Cover image file is missing")
+  }
+
+  //TODO: delete old image - assignment
+
+
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+
+  if (!coverImage.url) {
+      throw new ApiError(400, "Error while uploading on avatar")
+      
+  }
+
+  const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+          $set:{
+              coverImage: coverImage.url
+          }
+      },
+      {new: true}
+  ).select("-password")
+
+  return res
+  .status(200)
+  .json(
+      new ApiResponse(200, user, "Cover image updated successfully")
+  )
+})
+
+
+export 
+{ 
+  registerUser ,
+  loginUser ,
+  logoutUser,
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCoverImage
+};
 
